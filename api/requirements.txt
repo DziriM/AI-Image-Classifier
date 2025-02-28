@@ -1,0 +1,7 @@
+tensorflow
+keras
+fastapi
+uvicorn
+streamlit
+pillow
+numpy
