@@ -107,3 +107,10 @@ docker run -p 8000:8000 ai-image-classifier
 - 📌 Crée une branche (git checkout -b feature-xxx)
 - 📌 Fais tes modifications et commit (git commit -m "Ajout de xxx")
 - 📌 Push ta branche et ouvre une Pull Request !
+
+## 📚 Pour aller plus loin
+
+Si vous souhaitez en apprendre davantage sur la base de données ImageNet utilisée pour entraîner ResNet50, voici la publication originale de 2009 :
+
+📄 **ImageNet: A Large-Scale Hierarchical Image Database**  
+🔗 [Lire la publication](https://image-net.org/static_files/papers/imagenet_cvpr09.pdf)

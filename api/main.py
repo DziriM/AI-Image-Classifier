@@ -1,24 +1,36 @@
-from fastapi import FastAPI, UploadFile, File
-from tensorflow.keras.applications import ResNet50
-from tensorflow.keras.preprocessing import image
-from tensorflow.keras.applications.resnet50 import preprocess_input, decode_predictions
-import numpy as np
-import io
-from PIL import Image
+from fastapi import FastAPI, UploadFile, File, HTTPException
+import logging
+from models.model import predict_image
 
+# 🔹 Initialisation des logs
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# 🔹 Initialisation de l'application FastAPI
 app = FastAPI()
-model = ResNet50(weights="imagenet")
 
 @app.post("/predict/")
 async def predict(file: UploadFile = File(...)):
-    contents = await file.read()
-    img = Image.open(io.BytesIO(contents))
-    img = img.resize((224, 224))
-    img_array = image.img_to_array(img)
-    img_array = np.expand_dims(img_array, axis=0)
-    img_array = preprocess_input(img_array)
+    """
+    Endpoint permettant de recevoir une image et de retourner la prédiction du modèle.
 
-    preds = model.predict(img_array)
-    result = decode_predictions(preds, top=3)[0]
+    Args:
+        file (UploadFile): Une image envoyée par l'utilisateur.
 
-    return {"predictions": [{ "label": label, "probability": float(prob) } for (_, label, prob) in result]}
+    Returns:
+        dict: Les trois prédictions les plus probables avec leur score de confiance.
+    """
+    try:
+        # 🔹 Lecture du contenu de l'image
+        image_bytes = await file.read()
+
+        # 🔹 Prédiction de l'image
+        predictions = predict_image(image_bytes)
+        if predictions is None:
+            raise HTTPException(status_code=400, detail="Erreur lors du traitement de l'image.")
+
+        return {"predictions": predictions}
+
+    except Exception as e:
+        logger.error(f"Erreur lors de la prédiction : {e}")
+        raise HTTPException(status_code=500, detail="Erreur interne du serveur.")
